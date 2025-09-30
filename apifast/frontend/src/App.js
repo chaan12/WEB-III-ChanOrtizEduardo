@@ -9,7 +9,7 @@ function App() {
 
   const sumar = async () => {
     const res = await fetch(
-      `http://localhost:8080/calculadora/sum?a=${a}&b=${b}`
+      `http://localhost:8089/calculadora/sum?a=${a}&b=${b}`
     );
     const data = await res.json();
     setResultado(data.resultado);
@@ -17,7 +17,7 @@ function App() {
   };
 
   const obtenerHistorial = async () => {
-    const res = await fetch("http://localhost:8080/calculadora/historial");
+    const res = await fetch("http://localhost:8089/calculadora/historial");
     const data = await res.json();
     setHistorial(data.historial);
   };
