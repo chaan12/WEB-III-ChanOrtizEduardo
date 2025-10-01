@@ -82,97 +82,122 @@ function App() {
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Calculadora</h1>
-      {numeros.map((num, i) => (
-        <input
-          key={i}
-          type="text"
-          inputMode="decimal"
-          min="0"
-          value={num}
-          onChange={(e) => handleNumeroChange(i, e.target.value)}
-          placeholder="0"
-        />
-      ))}
-      <button onClick={agregarCampo}>Agregar número</button>
-      <div style={{ marginTop: 10 }}>
-        <button onClick={sumar}>Sumar</button>
-        <button onClick={restar}>Restar</button>
-        <button onClick={multiplicar}>Multiplicar</button>
-        <button onClick={dividir}>Dividir</button>
+    <div className="app-container">
+      <h1 className="title">ChanCalculadora</h1>
+      <div className="calc-card">
+        {numeros.map((num, i) => (
+          <input
+            key={i}
+            type="text"
+            inputMode="decimal"
+            min="0"
+            value={num}
+            onChange={(e) => handleNumeroChange(i, e.target.value)}
+            placeholder="0"
+            className="num-input"
+          />
+        ))}
+        <div className="add-btn-container">
+          <button className="btn add-btn btn-fixed" onClick={agregarCampo}>
+            Agregar número
+          </button>
+        </div>
+        <div className="btn-group">
+          <button className="btn primary" onClick={sumar}>Sumar</button>
+          <button className="btn warning" onClick={restar}>Restar</button>
+          <button className="btn success" onClick={multiplicar}>Multiplicar</button>
+          <button className="btn danger" onClick={dividir}>Dividir</button>
+        </div>
+        {resultado !== null && (
+          <div className="result">
+            <span>Resultado: </span>
+            <b>{resultado}</b>
+          </div>
+        )}
       </div>
-      {resultado !== null && <h2>Resultado: {resultado}</h2>}
 
-      <h3>Filtros de historial:</h3>
-      <div style={{ marginBottom: 10 }}>
-        <select
-          value={filtroOperacion}
-          onChange={e => {
-            setFiltroOperacion(e.target.value);
-            setOrdenFecha("");
-            setOrdenResultado("");
-          }}
-        >
-          <option value="">Todas</option>
-          <option value="suma">Suma</option>
-          <option value="resta">Resta</option>
-          <option value="multiplicacion">Multiplicación</option>
-          <option value="division">División</option>
-        </select>
-        <input
-          type="date"
-          value={fecha}
-          onChange={e => {
-            setFecha(e.target.value);
-            setOrdenFecha("");
-            setOrdenResultado("");
-          }}
-        />
-        <select
-          value={ordenFecha}
-          onChange={e => {
-            setOrdenFecha(e.target.value);
-            setFiltroOperacion("");
-            setFecha("");
-            setOrdenResultado("");
-          }}
-        >
-          <option value="asc">Fecha Ascendente</option>
-          <option value="desc">Fecha Descendente</option>
-        </select>
-        <br />
-        <select
-          value={ordenResultado}
-          onChange={e => {
-            setOrdenResultado(e.target.value);
-            setFiltroOperacion("");
-            setFecha("");
-            setOrdenFecha("");
-          }}
-        >
-          <option value="asc">Resultado Ascendente</option>
-          <option value="desc">Resultado Descendente</option>
-        </select>
-        <button onClick={obtenerHistorial}>Aplicar filtros</button>
+      <div className="filter-card">
+        <h3>Filtros de historial:</h3>
+        <div className="filters">
+          <select
+            value={filtroOperacion}
+            onChange={e => {
+              setFiltroOperacion(e.target.value);
+              setOrdenFecha("");
+              setOrdenResultado("");
+            }}
+          >
+            <option value="">Todas</option>
+            <option value="suma">Suma</option>
+            <option value="resta">Resta</option>
+            <option value="multiplicacion">Multiplicación</option>
+            <option value="division">División</option>
+          </select>
+          <input
+            type="date"
+            value={fecha}
+            onChange={e => {
+              setFecha(e.target.value);
+              setOrdenFecha("");
+              setOrdenResultado("");
+            }}
+          />
+          <select
+            value={ordenFecha}
+            onChange={e => {
+              setOrdenFecha(e.target.value);
+              setFiltroOperacion("");
+              setFecha("");
+              setOrdenResultado("");
+            }}
+          >
+            <option value="asc">Fecha Ascendente</option>
+            <option value="desc">Fecha Descendente</option>
+          </select>
+          <select
+            value={ordenResultado}
+            onChange={e => {
+              setOrdenResultado(e.target.value);
+              setFiltroOperacion("");
+              setFecha("");
+              setOrdenFecha("");
+            }}
+          >
+            <option value="asc">Resultado Ascendente</option>
+            <option value="desc">Resultado Descendente</option>
+          </select>
+        </div>
+        <p className="filters-hint">
+          Puedes combinar <b>Tipo de operación</b> y <b>Fecha</b>.  
+          Si seleccionas un ordenamiento, los demás filtros se desactivan automáticamente.
+        </p>
       </div>
-      <p style={{ fontStyle: "italic", color: "gray" }}>
-        Puedes combinar <b>Tipo de operación</b> y <b>Fecha</b>.  
-        Si seleccionas un ordenamiento, los demás filtros se desactivan automáticamente.
-      </p>
 
       <h3>Historial:</h3>
       {historial.length > 0 ? (
-        <ul>
-          {historial.map((op, i) => (
-            <li key={i}>
-              {op.numeros.join(", ")} {op.operacion} = {op.resultado} ({formatDate(op.date)})
-            </li>
-          ))}
-        </ul>
+        <table className="hist-table">
+          <thead>
+            <tr>
+              <th>Números</th>
+              <th>Operación</th>
+              <th>Resultado</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            {historial.map((op, i) => (
+              <tr key={i}>
+                <td>{op.numeros.join(", ")}</td>
+                <td>{op.operacion}</td>
+                <td>{op.resultado}</td>
+                <td>{formatDate(op.date)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       ) : (
-        <p style={{ color: "gray", fontStyle: "italic" }}>
-          No hay registros quase coincidan con los filtros seleccionados.
+        <p className="no-data">
+          🚫 No hay registros que coincidan con los filtros seleccionados.
         </p>
       )}
     </div>

@@ -11,7 +11,6 @@ logging.basicConfig(level=logging.INFO)
 
 app = FastAPI()
 
-# Configurar CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -20,13 +19,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-#MongoDB Collection
 mongo_uri = os.getenv("MONGO_URI", "mongodb://admin_user:web3@mongo:27017/")
 mongo_client = MongoClient(mongo_uri)
 database = mongo_client.practica1
 collection_historial = database.historial
 
-# Modelos de datos
 class Operacion(BaseModel):
     numeros: List[float]
 
@@ -56,7 +53,6 @@ class LoteOperacion(BaseModel):
             raise ValueError("Solo se permiten números")
         return v
 
-# Función auxiliar
 def insertar_historial(numeros, resultado, operacion):
     document = {
         "numeros": numeros,
@@ -68,9 +64,9 @@ def insertar_historial(numeros, resultado, operacion):
     logging.info(f"guardado: {numeros} = {resultado} ({operacion})")
 
 def validar_operandos(numeros, operacion):
-    if len(numeros) != 2:
-        logging.warning(f"mal: se necesitan 2 operandos -> {numeros}")
-        raise HTTPException(status_code=400, detail="Se requieren exactamente 2 operandos")
+    if len(numeros) < 2:
+        logging.warning(f"mal: se necesitan al menos 2 operandos -> {numeros}")
+        raise HTTPException(status_code=400, detail="Se requieren al menos 2 operandos")
     for n in numeros:
         if n < 0:
             logging.warning(f"mal: num negativo en {numeros}")
@@ -119,10 +115,8 @@ def dividir(data: Operacion):
     insertar_historial(data.numeros, result, "division")
     return {"numeros": data.numeros, "resultado": result}
 
-# Utilidad: rango de un día completo en UTC
 def _rango_dia_utc(fecha_str: str):
     try:
-        # Acepta "YYYY-MM-DD" o ISO completo; siempre recortamos al día
         if "T" in fecha_str:
             dt = datetime.datetime.fromisoformat(fecha_str)
             if dt.tzinfo is None:
@@ -154,10 +148,9 @@ def obtener_historial(
     fecha: str = Query(None),
     fecha_inicio: str = Query(None),
     fecha_fin: str = Query(None),
-    orden_fecha: str = Query(None),   # "asc" | "desc" | None
-    orden_resultado: str = Query(None),  # "asc" | "desc" | None
+    orden_fecha: str = Query(None), 
+    orden_resultado: str = Query(None),
 ):
-    # Forzar que solo se puedan combinar operacion + fecha/rango
     if (orden_fecha or orden_resultado) and (operacion and (fecha or fecha_inicio or fecha_fin)):
         orden_fecha = None
         orden_resultado = None
@@ -188,7 +181,6 @@ def obtener_historial(
             if orden_fecha:
                 orden_fecha = None
 
-    # Armar orden con prioridad orden_fecha primero, luego orden_resultado
     sort_fields = []
     if orden_fecha in ("asc", "desc"):
         sort_fields.append(("date", 1 if orden_fecha == "asc" else -1))
@@ -199,7 +191,6 @@ def obtener_historial(
     if sort_fields:
         cursor = cursor.sort(sort_fields)
     else:
-        # Por defecto, por fecha descendente (más reciente primero)
         cursor = cursor.sort("date", -1)
 
     historial = []

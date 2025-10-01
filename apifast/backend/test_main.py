@@ -39,7 +39,6 @@ def test_historial(monkeypatch):
     response = client.get("/calculadora/historial")
     assert response.status_code == 200
 
-    #Obtenemos todos los documentos que ya fueron ingresados
     expected_data = list(fake_collection_historial.find({}))
 
     historial = []
@@ -54,5 +53,4 @@ def test_historial(monkeypatch):
     print(f"DEBUG: exected_data{historial}")
     print(f"DEBUG: response.json{response.json()}")
 
-    #Comparamos las respuestas
     assert response.json() == {"historial": historial}

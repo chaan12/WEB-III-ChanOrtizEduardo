@@ -4,7 +4,6 @@ import pytest
 import mongomock
 from fastapi.testclient import TestClient
 
-# Permitir importación de main.py
 CURRENT_DIR = os.path.dirname(__file__)
 BACKEND_DIR = os.path.dirname(CURRENT_DIR)
 if BACKEND_DIR not in sys.path:
@@ -79,4 +78,4 @@ def test_lote_operandos_invalidos(monkeypatch, fake_collection_historial):
     assert r.status_code == 200
     data = r.json()
     assert "error" in data[0]
-    assert "exactamente 2 operandos" in data[0]["error"]
+    assert "Se requieren al menos 2 operandos" in data[0]["error"]

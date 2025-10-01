@@ -8,7 +8,6 @@ import mongomock
 from pymongo import MongoClient
 from fastapi.testclient import TestClient
 
-# Permitir importación de main.py
 CURRENT_DIR = os.path.dirname(__file__)
 BACKEND_DIR = os.path.dirname(CURRENT_DIR)
 if BACKEND_DIR not in sys.path:
@@ -16,16 +15,13 @@ if BACKEND_DIR not in sys.path:
 
 import main
 
-# Crear cliente y colección mongomock
 fake_mongo_client = mongomock.MongoClient()
 fake_database = fake_mongo_client["calculadora_test"]
 fake_collection_historial = fake_database["historial"]
 
 def setup_module(module):
-    # limpiar colección antes de iniciar pruebas
     fake_collection_historial.delete_many({})
 
-    # insertar datos de prueba con 'numeros'
     base_date = datetime.datetime(2023, 1, 1, tzinfo=datetime.timezone.utc)
     docs = [
         {"numeros": [2, 3], "resultado": 5, "operacion": "suma", "date": base_date},
@@ -63,5 +59,4 @@ def test_filtrar_por_fecha(monkeypatch):
     r = client.get("/calculadora/historial", params={"fecha_inicio": fecha_inicio, "fecha_fin": fecha_fin})
     assert r.status_code == 200
     data = r.json()["historial"]
-    # Convertir date a fecha para comparar solo el día
     assert all("2023-01-02" <= item["date"][:10] <= "2023-01-03" for item in data)
