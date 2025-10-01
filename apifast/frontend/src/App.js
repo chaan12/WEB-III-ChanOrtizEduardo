@@ -8,9 +8,15 @@ function App() {
   const [historial, setHistorial] = useState([]);
 
   const sumar = async () => {
-    const res = await fetch(
-      `http://localhost:8089/calculadora/sum?a=${a}&b=${b}`
-    );
+    const res = await fetch("http://localhost:8089/calculadora/sum", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        numeros: [parseFloat(a), parseFloat(b)],
+      }),
+    });
     const data = await res.json();
     setResultado(data.resultado);
     obtenerHistorial();
@@ -47,7 +53,10 @@ function App() {
       <ul>
         {historial.map((op, i) => (
           <li key={i}>
-            {op.a} + {op.b} = {op.resultado} ({op.date})
+            {op.numeros && Array.isArray(op.numeros)
+              ? op.numeros.join(" + ")
+              : ""}{" "}
+            = {op.resultado} ({op.date})
           </li>
         ))}
       </ul>
