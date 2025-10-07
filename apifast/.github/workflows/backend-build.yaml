@@ -1,9 +1,10 @@
 name: Build and Push Docker Image
 
-on: 
+on:
   push:
-    branches: ["main"]
-    tag:
+    branches:
+      - "main"
+    tags:
       - "v*.*.*"
 
 jobs:
@@ -12,7 +13,7 @@ jobs:
 
     permissions:
       contents: read
-      packages: write #es necesario para subir a GHCR
+      packages: write  # necesario para subir a GHCR
 
     steps:
       - name: Checkout repository
@@ -25,7 +26,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Determine image taps
+      - name: Determine image tags
         id: vars
         run: |
           if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
@@ -36,7 +37,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/${{ github.repository }}:${{ env.TAG }} -f .backend
+          docker build -t ghcr.io/${{ github.repository }}:${{ env.TAG }} -f ./backend/Dockerfile .
 
       - name: Push Docker image
         run: |
