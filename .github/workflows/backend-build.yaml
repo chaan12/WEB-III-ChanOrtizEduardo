@@ -37,7 +37,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/${{ github.repository }}:${{ env.TAG }} -f ./backend/Dockerfile .
+          docker build -t ghcr.io/${{ github.repository }}:${{ env.TAG }} -f apifast/backend/Dockerfile .
 
       - name: Push Docker image
         run: |
