@@ -35,10 +35,14 @@ jobs:
             echo "TAG=latest" >> $GITHUB_ENV
           fi
 
+      - name: Normalize repository name to lowercase
+        run: |
+          echo "REPO_LC=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/${{ github.repository,, }}:${{ env.TAG }} -f apifast/backend/Dockerfile .
+          docker build -t ghcr.io/${{ env.REPO_LC }}:${{ env.TAG }} -f apifast/backend/Dockerfile .
 
       - name: Push Docker image
         run: |
-          docker push ghcr.io/${{ github.repository,, }}:${{ env.TAG }}
+          docker push ghcr.io/${{ env.REPO_LC }}:${{ env.TAG }}
