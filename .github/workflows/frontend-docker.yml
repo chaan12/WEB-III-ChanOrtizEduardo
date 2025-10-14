@@ -1,0 +1,60 @@
+name: Build & Push Frontend (apifast/frontend)
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "apifast/frontend/**"
+      - ".github/workflows/frontend-docker.yml"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Versión SemVer para tag (ej. 1.0.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/frontend
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resolve version
+        id: v
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=0.0.0-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build & Push
+        uses: docker/build-push-action@v6
+        with:
+          context: apifast/frontend
+          file: apifast/frontend/Dockerfile
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v${{ steps.v.outputs.version }}
+          labels: |
+            org.opencontainers.image.source=${{ github.repositoryUrl }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=v${{ steps.v.outputs.version }}
